@@ -10,6 +10,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import MessageIcon from "@mui/icons-material/Message";
 
+
 // Wrap component with forwardRef
 const ContactForm = forwardRef((props, ref) => {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const ContactForm = forwardRef((props, ref) => {
       await axios.post("http://localhost:5000/api/contact", contactData);
     },
     onSuccess: () => {
-      dispatch(setStatus("Message sent successfully!"));
+      dispatch(setStatus("Email & Message sent successfully!"));
       formik.resetForm();
     },
     onError: () => {

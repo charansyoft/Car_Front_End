@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  InputAdornment,
-  IconButton,
-} from "@mui/material";
+import { Box, TextField, Button, Typography, InputAdornment, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
@@ -25,6 +18,9 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 function SignUpPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
 
   // Toggle password visibility
@@ -34,9 +30,7 @@ function SignUpPage() {
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
+    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password"), null], "Passwords must match")
       .required("Confirm password is required"),
@@ -44,15 +38,28 @@ function SignUpPage() {
 
   // React Query: Handle sign-up request
   const mutation = useMutation({
-    mutationFn: async (userData) =>
-      axios.post("http://localhost:5000/api/signup", userData),
+    mutationFn: async (userData) => {
+      return axios.post("http://localhost:5000/api/signup", userData);
+    },
     onSuccess: () => {
       dispatch(setStatus("User created successfully!"));
-      navigate("/login"); // Redirect to login page after signup
+      setSuccessMessage("Account created successfully!"); // Show success message
+      setErrorMessage(""); // Clear error message
     },
-    onError: () => {
-      dispatch(setStatus("Failed to sign up. Please try again."));
+    onError: (error) => {
+      console.log("Signup error:", error.response?.data); // Log the error response
+    
+      if (error.response && error.response.data) {
+        if (error.response.data.error === "Email already exists") {
+          setErrorMessage("Already mail exists");
+        } else {
+          setErrorMessage(error.response.data.error);
+        }
+      } else {
+        setErrorMessage("Failed to sign up. Please try again.");
+      }
     },
+    
   });
 
   return (
@@ -73,14 +80,12 @@ function SignUpPage() {
       </Typography>
 
       <Formik
-        initialValues={{
-          username: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        }}
+        initialValues={{ username: "", email: "", password: "", confirmPassword: "" }}
         validationSchema={validationSchema}
-        onSubmit={(values) => mutation.mutate(values)}
+        onSubmit={(values) => {
+          console.log("Submitting data:", values);
+          mutation.mutate(values);
+        }}
       >
         {({ errors, touched }) => (
           <Form>
@@ -162,16 +167,28 @@ function SignUpPage() {
             <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>
               Sign Up
             </Button>
-
-            {/* Login Redirect Button */}
             <Button
-              variant="outlined"
-              fullWidth
-              sx={{ mt: 2 }}
-              onClick={() => navigate("/login")}
-            >
-              Already have an account? Login
-            </Button>
+        variant="outlined"
+        fullWidth
+        sx={{ mt: 2 }}
+        onClick={() => navigate("/login")}
+      >
+        Already have an account? Login
+      </Button>
+
+            {/* Display Error Message (Red) */}
+            {errorMessage && (
+              <Typography color="error" sx={{ mt: 2, textAlign: "center" }}>
+                {errorMessage}
+              </Typography>
+            )}
+
+            {/* Display Success Message (Green) */}
+            {successMessage && (
+              <Typography color="green" sx={{ mt: 2, textAlign: "center" }}>
+                {successMessage}
+              </Typography>
+            )}
           </Form>
         )}
       </Formik>

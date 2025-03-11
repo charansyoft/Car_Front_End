@@ -1,7 +1,16 @@
 const UserFrontPage = () => {
     return (
-      <div>
-        <h2 style={{marginTop:"140px"}}>Welcome to the User Front Page!</h2>
+      <div style={{marginTop:"100px"}}>
+        <h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p>
+        <h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p><h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p><h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p><h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p><h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p><h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p><h2>Welcome to the User Front Page!</h2>
+        <p>You are logged in successfully.</p><h2>Welcome to the User Front Page!</h2>
         <p>You are logged in successfully.</p>
       </div>
     );

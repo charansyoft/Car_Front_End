@@ -9,44 +9,43 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useDispatch, useSelector } from "react-redux";
-import authReducer, { setStatus } from "../redux/authSlice";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
 // MUI Icons
-import { Person, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const statusMessage = useSelector((state) => state.auth.status);
+  const [statusMessage, setStatusMessage] = useState("");
 
   // Toggle password visibility
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   // Validation Schema
   const validationSchema = Yup.object({
-    username: Yup.string().required("Username is required"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
 
-  // Handle login request with React Query
+  // Handle login request
   const mutation = useMutation({
-    mutationFn: (userData) =>
-      axios.post("http://localhost:5000/api/login", userData, {
-        timeout: 5000,
-      }),
-    onSuccess: (response) => {
-      dispatch(setStatus(response.data.message));
-      navigate("/userFrontPage");
+    mutationFn: async (userData) => {
+      const response = await axios.post("http://localhost:5000/api/login", userData);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setStatusMessage(""); // Clear errors
+      navigate("/userFrontPage"); // Redirect on success
     },
     onError: () => {
-      dispatch(setStatus("Invalid credentials"));
+      setStatusMessage("Invalid credentials. Please try again.");
     },
   });
 
@@ -56,9 +55,8 @@ function LoginPage() {
         maxWidth: 400,
         margin: "auto",
         mt: 14,
-        mb: 4,
         p: 4,
-        border: "2px solid black",
+        mb:4,
         borderRadius: "8px",
         bgcolor: "white",
         boxShadow: 3,
@@ -69,25 +67,25 @@ function LoginPage() {
       </Typography>
 
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ email: "", password: "" }}
         validationSchema={validationSchema}
         onSubmit={(values) => mutation.mutate(values)}
       >
         {({ errors, touched }) => (
           <Form>
-            {/* Username Field */}
+            {/* Email Field */}
             <Field
               as={TextField}
-              name="username"
-              label="Username"
+              name="email"
+              label="Email"
               fullWidth
               margin="normal"
-              error={touched.username && !!errors.username}
-              helperText={touched.username && errors.username}
+              error={touched.email && !!errors.email}
+              helperText={touched.email && errors.email}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Person />
+                    <Email />
                   </InputAdornment>
                 ),
               }}
@@ -126,15 +124,6 @@ function LoginPage() {
           </Form>
         )}
       </Formik>
-      {/* Login Redirect Button */}
-      <Button
-        variant="outlined"
-        fullWidth
-        sx={{ mt: 2 }}
-        onClick={() => navigate("/signup")}
-      >
-        Already have an account? Login
-      </Button>
 
       {/* Show login status message */}
       {statusMessage && (
