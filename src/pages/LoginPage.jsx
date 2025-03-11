@@ -1,73 +1,131 @@
 import { useState } from "react";
-import { Box, TextField, Button, Typography } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
+import authReducer, { setStatus } from "../redux/authSlice";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+
+// MUI Icons
+import { Person, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
 
 function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [status, setStatus] = useState("");
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
+  const statusMessage = useSelector((state) => state.auth.status);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Toggle password visibility
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-    const userData = {
-      username,
-      password,
-    };
+  // Validation Schema
+  const validationSchema = Yup.object({
+    username: Yup.string().required("Username is required"),
+    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  });
 
-    try {
-      // Send the login request to the backend
-      const response = await axios.post("http://localhost:5000/api/login", userData);
-      
-      // If login is successful, display the message and redirect to the UserFrontPage
-      setStatus(response.data.message); // Display the "Hi" message from backend
-      setUsername("");
-      setPassword("");
-
-      // Redirect to user front page
+  // Handle login request with React Query
+  const mutation = useMutation({
+    mutationFn: (userData) => axios.post("http://localhost:5000/api/login", userData, { timeout: 5000 }),
+    onSuccess: (response) => {
+      dispatch(setStatus(response.data.message)); 
       navigate("/userFrontPage");
-    } catch (err) {
-      // If there’s an error, set the status message to "Login failed"
-      setStatus("Login failed. Please check your credentials.");
-    }
-  };
+    },
+    onError: () => {
+      dispatch(setStatus("Invalid credentials"));
+    },
+  });
 
   return (
-    <Box sx={{ maxWidth: 400, margin: "auto", mt: 14, mb: 4 }}>
-      <Typography variant="h4" align="center">
+    <Box
+      sx={{
+        maxWidth: 400,
+        margin: "auto",
+        mt: 14,
+        mb: 4,
+        p: 4,
+        border: "2px solid black",
+        borderRadius: "8px",
+        bgcolor: "white",
+        boxShadow: 3,
+      }}
+    >
+      <Typography variant="h4" align="center" gutterBottom>
         Login
       </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Username"
-          fullWidth
-          margin="normal"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <TextField
-          label="Password"
-          fullWidth
-          type="password"
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button variant="contained" type="submit" fullWidth>
-          Login
-        </Button>
-      </form>
+      <Formik
+        initialValues={{ username: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={(values) => mutation.mutate(values)}
+      >
+        {({ errors, touched }) => (
+          <Form>
+            {/* Username Field */}
+            <Field
+              as={TextField}
+              name="username"
+              label="Username"
+              fullWidth
+              margin="normal"
+              error={touched.username && !!errors.username}
+              helperText={touched.username && errors.username}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-      {status && (
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{ mt: 2, color: status.includes("Hi") ? "green" : "red" }}
-        >
-          {status}
+            {/* Password Field */}
+            <Field
+              as={TextField}
+              name="password"
+              label="Password"
+              fullWidth
+              type={showPassword ? "text" : "password"}
+              margin="normal"
+              error={touched.password && !!errors.password}
+              helperText={touched.password && errors.password}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={togglePasswordVisibility} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            {/* Submit Button */}
+            <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>
+              Login
+            </Button>
+          </Form>
+        )}
+      </Formik>
+
+      {/* Show login status message */}
+      {statusMessage && (
+        <Typography color="error" align="center" sx={{ mt: 2 }}>
+          {statusMessage}
         </Typography>
       )}
     </Box>

@@ -1,96 +1,165 @@
 import { useState } from "react";
-import { Box, TextField, Button, Typography } from "@mui/material";
+import { Box, TextField, Button, Typography, InputAdornment, IconButton } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
+import { setStatus } from "../redux/authSlice";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import axios from "axios";
 
+// MUI Icons
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import PersonIcon from "@mui/icons-material/Person";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
 function SignUpPage() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [status, setStatus] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Toggle password visibility
+  const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      setStatus("Passwords do not match!");
-      return;
-    }
+  // Validation Schema
+  const validationSchema = Yup.object({
+    username: Yup.string().required("Username is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Confirm password is required"),
+  });
 
-    const userData = {
-      username,
-      email,
-      password,
-    };
-
-    try {
-      // Send data to the backend for user registration
-      const response = await axios.post("http://localhost:5000/api/signup", userData);
-      setStatus("Sign-Up successful!");
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      setStatus("Failed to sign up. Please try again.");
-    }
-  };
+  // React Query: Handle sign-up request
+  const mutation = useMutation({
+    mutationFn: async (userData) => axios.post("http://localhost:5000/api/signup", userData),
+    onSuccess: () => {
+      dispatch(setStatus("User created successfully!"));
+      navigate("/login"); // Redirect to login page after signup
+    },
+    onError: () => {
+      dispatch(setStatus("Failed to sign up. Please try again."));
+    },
+  });
 
   return (
-    <Box sx={{ maxWidth: 400, margin: "auto", mb: 4, mt: 14 }}>
-      <Typography variant="h4" align="center">
+    <Box
+      sx={{
+        maxWidth: 400,
+        margin: "auto",
+        mt: 12,
+        mb: 4,
+        p: 4,
+        borderRadius: "12px",
+        bgcolor: "white",
+        boxShadow: 4,
+      }}
+    >
+      <Typography variant="h4" align="center" gutterBottom>
         Sign Up
       </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Username"
-          fullWidth
-          margin="normal"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <TextField
-          label="Email"
-          fullWidth
-          margin="normal"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          label="Password"
-          fullWidth
-          type="password"
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <TextField
-          label="Confirm Password"
-          fullWidth
-          type="password"
-          margin="normal"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-        <Button variant="contained" type="submit" fullWidth>
-          Sign Up
-        </Button>
-      </form>
+      <Formik
+        initialValues={{ username: "", email: "", password: "", confirmPassword: "" }}
+        validationSchema={validationSchema}
+        onSubmit={(values) => mutation.mutate(values)}
+      >
+        {({ errors, touched }) => (
+          <Form>
+            {/* Username Field */}
+            <Field
+              as={TextField}
+              name="username"
+              label="Username"
+              fullWidth
+              margin="normal"
+              error={touched.username && !!errors.username}
+              helperText={touched.username && errors.username}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-      {status && (
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{
-            mt: 2,
-            color: status.includes("successful") ? "green" : "red",
-          }}
-        >
-          {status}
-        </Typography>
-      )}
+            {/* Email Field */}
+            <Field
+              as={TextField}
+              name="email"
+              label="Email"
+              fullWidth
+              margin="normal"
+              error={touched.email && !!errors.email}
+              helperText={touched.email && errors.email}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            {/* Password Field */}
+            <Field
+              as={TextField}
+              name="password"
+              label="Password"
+              fullWidth
+              type={showPassword ? "text" : "password"}
+              margin="normal"
+              error={touched.password && !!errors.password}
+              helperText={touched.password && errors.password}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleTogglePassword} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            {/* Confirm Password Field */}
+            <Field
+              as={TextField}
+              name="confirmPassword"
+              label="Confirm Password"
+              fullWidth
+              type={showPassword ? "text" : "password"}
+              margin="normal"
+              error={touched.confirmPassword && !!errors.confirmPassword}
+              helperText={touched.confirmPassword && errors.confirmPassword}
+            />
+
+            {/* Submit Button */}
+            <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>
+              Sign Up
+            </Button>
+
+            {/* Login Redirect Button */}
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={() => navigate("/login")}
+            >
+              Already have an account? Login
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Box>
   );
 }
