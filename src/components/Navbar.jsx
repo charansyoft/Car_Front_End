@@ -4,14 +4,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice"; // Import logout action
 
 function Navbar({ scrollToContact, scrollToAbout }) {
-  const authState = useSelector((state) => state.auth);
-console.log(authState);
-
   const location = useLocation(); // Get current route
   const { isAuthenticated, username } = useSelector((state) => state.auth); // Get auth state from Redux
   const dispatch = useDispatch();
 
-  return (
+  // Check if the user is on the login or signup page
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+
+  return ( 
     <AppBar sx={{ width: "100%", background: "#121212", padding: "10px 20px" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography
@@ -25,7 +25,6 @@ console.log(authState);
         </Typography>
 
         <Box sx={{ display: "flex", gap: 2 }}>
-          {/* Show only username & logout button on userFrontPage */}
           {location.pathname === "/userFrontPage" ? (
             isAuthenticated && (
               <>
@@ -42,7 +41,8 @@ console.log(authState);
             )
           ) : (
             <>
-              {!isAuthenticated && (
+              {/* Hide About Us & Contact Us if on login/signup pages */}
+              {!isAuthPage && (
                 <>
                   <Button onClick={scrollToAbout} sx={{ color: "#fff" }}>
                     About Us
@@ -50,6 +50,11 @@ console.log(authState);
                   <Button onClick={scrollToContact} sx={{ color: "#fff" }}>
                     Contact Us
                   </Button>
+                </>
+              )}
+
+              {!isAuthenticated && (
+                <>
                   <Button component={Link} to="/login" sx={{ color: "#fff" }}>
                     Login
                   </Button>

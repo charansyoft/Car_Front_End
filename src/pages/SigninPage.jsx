@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, TextField, Button, Typography, InputAdornment, IconButton } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
@@ -27,7 +34,9 @@ function SignUpPage() {
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password"), null], "Passwords must match")
       .required("Confirm password is required"),
@@ -35,7 +44,8 @@ function SignUpPage() {
 
   // React Query: Handle sign-up request
   const mutation = useMutation({
-    mutationFn: async (userData) => axios.post("http://localhost:5000/api/signup", userData),
+    mutationFn: async (userData) =>
+      axios.post("http://localhost:5000/api/signup", userData),
     onSuccess: () => {
       dispatch(setStatus("User created successfully!"));
       navigate("/login"); // Redirect to login page after signup
@@ -63,7 +73,12 @@ function SignUpPage() {
       </Typography>
 
       <Formik
-        initialValues={{ username: "", email: "", password: "", confirmPassword: "" }}
+        initialValues={{
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        }}
         validationSchema={validationSchema}
         onSubmit={(values) => mutation.mutate(values)}
       >

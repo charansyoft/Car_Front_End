@@ -30,14 +30,19 @@ function LoginPage() {
   // Validation Schema
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
-    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
   });
 
   // Handle login request with React Query
   const mutation = useMutation({
-    mutationFn: (userData) => axios.post("http://localhost:5000/api/login", userData, { timeout: 5000 }),
+    mutationFn: (userData) =>
+      axios.post("http://localhost:5000/api/login", userData, {
+        timeout: 5000,
+      }),
     onSuccess: (response) => {
-      dispatch(setStatus(response.data.message)); 
+      dispatch(setStatus(response.data.message));
       navigate("/userFrontPage");
     },
     onError: () => {
@@ -121,6 +126,15 @@ function LoginPage() {
           </Form>
         )}
       </Formik>
+      {/* Login Redirect Button */}
+      <Button
+        variant="outlined"
+        fullWidth
+        sx={{ mt: 2 }}
+        onClick={() => navigate("/signup")}
+      >
+        Already have an account? Login
+      </Button>
 
       {/* Show login status message */}
       {statusMessage && (
