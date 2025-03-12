@@ -31,16 +31,14 @@ function Navbar({ scrollToContact, scrollToAbout }) {
                 <Typography sx={{ color: "#FFD700", fontWeight: "bold", mt: 1 }}>
                   {username}
                 </Typography>
-                <Button
-                  onClick={() => dispatch(logout())}
-                  sx={{ backgroundColor: "red", color: "#fff" }}
-                >
-                  Logout
-                </Button>
+                
               </>
             )
           ) : (
             <>
+            <Button component={Link} to="/products" sx={{ color: "#fff" }}>
+            Products
+          </Button>
               {/* Hide About Us & Contact Us if on login/signup pages */}
               {!isAuthPage && (
                 <>
@@ -77,12 +75,7 @@ function Navbar({ scrollToContact, scrollToAbout }) {
                   <Typography sx={{ color: "#FFD700", fontWeight: "bold", mt: 1 }}>
                     {username}
                   </Typography>
-                  <Button
-                    onClick={() => dispatch(logout())}
-                    sx={{ backgroundColor: "red", color: "#fff" }}
-                  >
-                    Logout
-                  </Button>
+                  
                 </>
               )}
             </>
