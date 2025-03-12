@@ -13,7 +13,7 @@ const Products = () => {
     >
       <Button
         component={Link}
-        to="/viewProducts"
+        to="/ViewProducts"
         variant="contained"
         color="secondary"
       >
@@ -21,7 +21,7 @@ const Products = () => {
       </Button>
       <Button
         component={Link}
-        to="/addProducts"
+        to="/AddProducts"
         variant="contained"
         color="secondary"
       >

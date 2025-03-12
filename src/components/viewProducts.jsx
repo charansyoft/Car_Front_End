@@ -1,7 +1,12 @@
-import React from "react";
-
 const ViewProducts = () => {
-  return <h1 style={{ marginTop: "150px" }}>View Products</h1>;
+  return (
+    <div style={{marginTop:"100px"}}>
+      <h2>View Product</h2>
+      <h2>View Product</h2>
+      <h2>View Product</h2>
+      <h2>View Product</h2>
+    </div>
+  );
 };
 
 export default ViewProducts;

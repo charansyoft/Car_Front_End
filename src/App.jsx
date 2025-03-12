@@ -7,15 +7,17 @@ import UserFrontPage from "./components/userFrontPage";
 import LoginPage from "./pages/LoginPage";
 import SigninPage from "./pages/SigninPage";
 import Products from "./components/Products";
-import AddProducts from "./components/addProducts";
 import ViewProducts from "./components/viewProducts";
+import AddProducts from "./components/AddProducts";
+import Bookings from "./components/Bookings";
+
 
 // Create a QueryClient instance
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}> {/* Ensure the QueryClientProvider is here */}
       <Router>
         <Navbar />
         <Routes>
@@ -24,12 +26,14 @@ function App() {
           <Route path="/signup" element={<SigninPage />} />
           <Route path="/userFrontPage" element={<UserFrontPage />} />
           <Route path="/products" element={<Products />} />
-          <Route path="/addProducts" element={<AddProducts/>} />
-          <Route path="/viewProducts" element={<ViewProducts/>}/>
+          <Route path="/AddProducts" element={<AddProducts/>} />
+          <Route path="/ViewProducts" element={<ViewProducts/>} />
+          <Route path="/Bookings" element={<Bookings/>} />
+
         </Routes>
         <Footer />
       </Router>
-    </QueryClientProvider>
+    </QueryClientProvider> 
   );
 }
 
