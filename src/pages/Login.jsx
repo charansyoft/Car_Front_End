@@ -24,7 +24,12 @@ const Login = () => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post("http://localhost:5000/api/auth/login", values, { withCredentials: true });
-        dispatch(setUser(response.data.user)); // Save user data in Redux
+        const { token, user } = response.data;
+
+        localStorage.setItem("token", token); // Store token
+        console.log("Token stored:", token);
+
+        dispatch(setUser(user)); // Save user data in Redux
         navigate("/UserFrontPage");
       } catch (err) {
         setError(err.response?.data?.message || "Invalid credentials");
@@ -33,15 +38,13 @@ const Login = () => {
   });
 
   return (
-    <Container maxWidth="xs" >
-      <Typography style={{marginTop: "120px"}} variant="h4">Login</Typography>
+    <Container maxWidth="xs">
+      <Typography style={{ marginTop: "120px" }} variant="h4">Login</Typography>
       {error && <Typography color="error">{error}</Typography>}
-      <form onSubmit={formik.handleSubmit} style={{marginBottom: "50px"}}>
+      <form onSubmit={formik.handleSubmit} style={{ marginBottom: "50px" }}>
         <TextField fullWidth label="Email" {...formik.getFieldProps("email")} margin="normal" />
         <TextField fullWidth type="password" label="Password" {...formik.getFieldProps("password")} margin="normal" />
-        <Button fullWidth type="submit" variant="contained" sx={{ mt: 2 }}>
-          Login
-        </Button>
+        <Button fullWidth type="submit" variant="contained" sx={{ mt: 2 }}>Login</Button>
       </form>
     </Container>
   );
