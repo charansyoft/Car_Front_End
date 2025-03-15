@@ -5,6 +5,7 @@ import ContactForm from "../components/ContactFrom";
 import CarSlider from "../components/CarSlider";
 import AboutUs from "../components/AboutUs";
 
+
 // 🏠 **Home Component**
 function Home() {
   const contactRef = useRef(null); // Reference for Contact section
@@ -36,6 +37,15 @@ function Home() {
 
   return (
     <Container maxWidth="lg">
+      {/* <div>
+        <h1>Welcome to Our App</h1>
+        <Link to="/login">
+          <button>Login</button>
+        </Link>
+        <Link to="/signup">
+          <button>Sign Up</button>
+        </Link>
+      </div> */}
       <Navbar
         scrollToTop={scrollToTop}
         scrollToContact={scrollToContact}
@@ -49,5 +59,3 @@ function Home() {
 }
 
 export default Home;
-
-

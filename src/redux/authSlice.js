@@ -1,26 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  status: "",
-  user: null, // To store user details if needed
+  user: null,
+  token: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setStatus: (state, action) => {
-      state.status = action.payload;
+    loginSuccess: (state, action) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
     },
     logout: (state) => {
-      state.status = ""; // Clear login status
-      state.user = null; // Clear user data if stored
+      state.user = null;
+      state.token = null;
     },
   },
 });
 
-// ✅ Export actions correctly
-export const { setStatus, logout } = authSlice.actions;
-
-// ✅ Export reducer
+export const { loginSuccess, logout } = authSlice.actions;
 export default authSlice.reducer;

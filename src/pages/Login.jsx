@@ -1,52 +1,30 @@
+// src/pages/Login.jsx
 import { useState } from "react";
-import { TextField, Button, Typography, Container } from "@mui/material";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setUser } from "../redux/userSlice";
+import axios from "axios";
 
 const Login = () => {
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema: Yup.object({
-      email: Yup.string().email("Invalid email").required("Email is required"),
-      password: Yup.string().required("Password is required"),
-    }),
-    onSubmit: async (values) => {
-      try {
-        const response = await axios.post("http://localhost:5000/api/auth/login", values, { withCredentials: true });
-        const { token, user } = response.data;
-
-        localStorage.setItem("token", token); // Store token
-        console.log("Token stored:", token);
-
-        dispatch(setUser(user)); // Save user data in Redux
-        navigate("/UserFrontPage");
-      } catch (err) {
-        setError(err.response?.data?.message || "Invalid credentials");
-      }
-    },
-  });
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+      localStorage.setItem("token", res.data.token);
+      navigate("/user");
+    } catch (error) {
+      alert("Login Failed");
+    }
+  };
 
   return (
-    <Container maxWidth="xs">
-      <Typography style={{ marginTop: "120px" }} variant="h4">Login</Typography>
-      {error && <Typography color="error">{error}</Typography>}
-      <form onSubmit={formik.handleSubmit} style={{ marginBottom: "50px" }}>
-        <TextField fullWidth label="Email" {...formik.getFieldProps("email")} margin="normal" />
-        <TextField fullWidth type="password" label="Password" {...formik.getFieldProps("password")} margin="normal" />
-        <Button fullWidth type="submit" variant="contained" sx={{ mt: 2 }}>Login</Button>
-      </form>
-    </Container>
+    <div>
+      <h2>Login</h2>
+      <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+      <button onClick={handleLogin}>Login</button>
+    </div>
   );
 };
 

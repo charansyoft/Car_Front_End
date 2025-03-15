@@ -1,27 +1,20 @@
-import { Button, Typography, Container } from "@mui/material";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { logout } from "../redux/userSlice";
 
-const UserFrontPage = () => {
+const UserFrontEnd = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const handleLogout = async () => {
-    await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
-    dispatch(logout()); // Clear user session in Redux
-    navigate("/login");
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove JWT from storage
+    navigate("/login"); // Redirect to login page
   };
 
   return (
-    <Container>
-      <Typography style={{marginTop: 100}} variant="h4">Welcome, User!</Typography>
-      <Button variant="contained" color="secondary" onClick={handleLogout}>
-        Logout
-      </Button>
-    </Container>
+    <div>
+      <h2>Welcome to Dashboard</h2>
+      <button onClick={handleLogout}>Logout</button>
+    </div>
   );
 };
 
-export default UserFrontPage;
+export default UserFrontEnd;
