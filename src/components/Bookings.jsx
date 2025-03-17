@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import Navbar from "./Navbar"
+import Footer from "./Footer"
+import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
+
 
 const fetchBookings = async () => {
   const { data } = await axios.get("http://localhost:5000/api/bookings");
@@ -17,7 +22,8 @@ const Bookings = () => {
 
   return (
     <div>
-      <h2>Bookings</h2>
+      <Navbar />
+      <h2 style={{marginTop: "100px"}}>Bookings</h2>
       <ul>
         {bookings.map((booking) => (
           <li key={booking._id}>
@@ -34,6 +40,17 @@ const Bookings = () => {
           </li>
         ))}
       </ul>
+      <Button
+  component={Link}
+  to="/Products"
+  variant="contained"
+  
+  sx={{my: "15px",cursor: "none", backgroundColor: "Black", color: "white", "&:hover": { backgroundColor: "darkblue" } }}
+>
+  View Cars
+</Button>
+
+      <Footer />
     </div>
   );
 };

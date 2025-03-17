@@ -4,6 +4,7 @@ import { useRef } from "react";
 import ContactForm from "../components/ContactFrom";
 import CarSlider from "../components/CarSlider";
 import AboutUs from "../components/AboutUs";
+import Footer from "../components/Footer";
 
 
 // 🏠 **Home Component**
@@ -54,6 +55,7 @@ function Home() {
       <CarSlider />
       <AboutUs ref={aboutRef} />
       <ContactForm ref={contactRef} />
+      <Footer />
     </Container>
   );
 }

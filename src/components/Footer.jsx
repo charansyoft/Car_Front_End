@@ -16,7 +16,7 @@ const Footer = () => {
         
       }}
     >
-      <Container maxWidth="xl">
+      <Container >
         <Typography variant="body1">
           Address: Miyapur, Hyderabad, Telangana
         </Typography>

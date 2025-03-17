@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Footer from "./Footer"
+import Navbar from "./Navbar"
+import { Link } from "react-router-dom";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Card,
@@ -23,7 +27,7 @@ const fetchProducts = async () => {
   return response.data;
 };
 
-const ViewProducts = () => {
+const ViewProducts = ({ disableButtons }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [open, setOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -80,7 +84,66 @@ const ViewProducts = () => {
   if (isError) return <p>Error fetching products.</p>;
 
   return (
-    <div style={{ padding: 20, marginTop: 100 }}>
+    <div>
+      {/* <Navbar /> */}
+      <div style={{ padding: 20 }}>
+      <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%", // Ensures full width
+  }}
+>
+  {/* Left-aligned heading */}
+  <h2 style={{ fontWeight: "bold" }}>Products</h2>
+
+  {/* Right-aligned buttons */}
+  <div style={{ display: "flex", gap: "10px" }}>
+    {/* Add Products Button */}
+    <Button
+        component={Link}
+        to="/AddProducts"
+        sx={{
+          backgroundColor: "#4CAF50", // Green
+          color: "white",
+          fontWeight: "bold",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          cursor: disableButtons ? "not-allowed" : "pointer", // 🚫 Blocked cursor
+          opacity: disableButtons ? 0.6 : 1, // Reduce visibility when disabled
+          pointerEvents: disableButtons ? "none" : "auto", // Disable clicks
+          "&:hover": { backgroundColor: disableButtons ? "#4CAF50" : "#388E3C" }, // Keeps original color when disabled
+        }}
+      >
+        Add Products
+      </Button>
+
+      {/* Bookings Button */}
+      <Button
+        component={Link}
+        to="/Bookings"
+        sx={{
+          backgroundColor: "#1565C0", // Deep blue
+          color: "white",
+          fontWeight: "bold",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          cursor: disableButtons ? "not-allowed" : "pointer",
+          opacity: disableButtons ? 0.6 : 1,
+          pointerEvents: disableButtons ? "none" : "auto",
+          "&:hover": { backgroundColor: disableButtons ? "#1565C0" : "#0D47A1" },
+        }}
+      >
+        Booking
+      </Button>
+
+  </div>
+</div>
+
+
+
+
       <Grid container spacing={3}>
         {products.map((product) => (
           <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
@@ -142,6 +205,9 @@ const ViewProducts = () => {
         </Alert>
       </Snackbar>
     </div>
+    <Footer />
+    </div>
+    
   );
 };
 

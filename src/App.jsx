@@ -5,8 +5,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/SignUp";
 import UserFrontPage from "./pages/UserFrontPage";
 import RequireAuth from "./components/RequireAuth";
-import Footer from "./components/Footer";
-import Navbar from "./components/Navbar";
 import Products from "./components/Products";
 import ViewProducts from "./components/ViewProducts";
 import Bookings from "./components/Bookings";
@@ -30,7 +28,7 @@ const App = () => {
 
           {/* Protected Route */}
           <Route element={<RequireAuth />}>
-            <Route path="/user" element={<UserFrontPage />} />
+            <Route path="/UserFrontPage" element={<UserFrontPage />} />
           </Route>
         </Routes>
       </Router>

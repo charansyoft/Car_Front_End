@@ -1,21 +1,25 @@
 import React from "react";
 import { Box, Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 const Products = () => {
   return (
-    <Box
+    <div>
+<Box
       display="flex"
       justifyContent="center"
       alignItems="center"
       gap={2}
       sx={{ marginTop: "150px", marginBottom: "50px" }}
     >
+      <Navbar />
       <Button
         component={Link}
         to="/ViewProducts"
         variant="contained"
-        color="secondary"
+        color="primary"
       >
         View Product
       </Button>
@@ -27,7 +31,12 @@ const Products = () => {
       >
         Add Product
       </Button>
+      
     </Box>
+    <Footer />
+    </div>
+    
+    
   );
 };
 
