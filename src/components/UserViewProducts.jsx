@@ -4,21 +4,21 @@ import {
   CardMedia,
   Grid,
   Typography,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
+  Snackbar,
+  Alert,
+  Button,
 } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import { Favorite, Close } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
-import Footer from "../components/Footer";
-import UserFrontPageNavbar from "../components/UserFrontPageNavbar";
+import Footer from "./Footer";
 
-// Fetch products
 const fetchProducts = async () => {
   const { data } = await axios.get("http://localhost:5000/api/products");
   return data;
@@ -48,35 +48,49 @@ const UserViewProducts = () => {
 
   return (
     <div>
-      <UserFrontPageNavbar/>
-      <h2 style={{ textAlign: "center", color: "#004d4d" }}>Products</h2>
-      <Grid container spacing={3}>
-        {products.map((product) => (
-          <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
-            <Card sx={{ boxShadow: 3, backgroundColor: "#f0f8ff" }}>
-              <CardMedia
-                component="img"
-                height="200"
-                image={`http://localhost:5000${product.image}`}
-                alt={product.name}
-              />
-              <CardContent>
-                <Typography variant="h6">{product.name}</Typography>
-                <Typography variant="body1">Price: ${product.price}</Typography>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  onClick={() => handleOpenDetails(product)} // Open the details modal
-                >
-                  View Details
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      <div style={{ marginBottom: "30px" }}>
+        <h2 style={{ color: "#004d4d", fontWeight: "bold", textAlign: "center" }}>
+          Products
+        </h2>
+        <Grid container spacing={3}>
+          {products.map((product) => (
+            <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
+              <Card sx={{ boxShadow: 3, backgroundColor: "#f0f8ff" }}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={`http://localhost:5000${product.image}`}
+                  alt={product.name}
+                  sx={{ borderRadius: "8px 8px 0 0" }}
+                />
+                <CardContent>
+                  <Typography variant="h6" color="#005f5f">
+                    {product.name}
+                  </Typography>
+                  <Typography variant="body1">Price: ${product.price}</Typography>
+                  <Typography variant="body2" color="gray">
+                    Fuel Type: {product.fuelType}
+                  </Typography>
+                  <Typography variant="body2" color="gray">
+                    Gear: {product.transmission}
+                  </Typography>
 
-      {/* Product Details Popup */}
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{ mt: 2, backgroundColor: "#008080", color: "white" }}
+                    onClick={() => handleOpenDetails(product)}
+                  >
+                    Details
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </div>
+
+      {/* Details Popup */}
       <Dialog open={detailsOpen} onClose={handleCloseDetails} maxWidth="sm" fullWidth>
         {selectedProduct && (
           <>
@@ -103,13 +117,22 @@ const UserViewProducts = () => {
               <Typography variant="body2">Gear: {selectedProduct.transmission}</Typography>
             </DialogContent>
             <DialogActions>
-              <Button variant="contained" color="primary" onClick={handleCloseDetails}>
-                Close
-              </Button>
+              <IconButton color="primary" aria-label="like">
+                <Favorite />
+              </IconButton>
             </DialogActions>
           </>
         )}
       </Dialog>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={false} // You can enable this if you want to show an error message after trying any failed actions
+        autoHideDuration={3000}
+        onClose={() => {}}
+      >
+        <Alert severity="error">Booking failed! Please try again.</Alert>
+      </Snackbar>
 
       <Footer />
     </div>

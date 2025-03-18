@@ -19,7 +19,13 @@ const Login = () => {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", values);
       localStorage.setItem("token", res.data.token);
-      navigate("/UserFrontPage");
+      
+      // ✅ Check if the email is "Admin123@gmail.com"
+      if (values.email === "Admin123@gmail.com") {
+        navigate("/AdminFrontPage");
+      } else {
+        navigate("/UserFrontPage");
+      }
     } catch (error) {
       alert("Login Failed");
     } finally {
