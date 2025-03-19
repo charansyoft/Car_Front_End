@@ -1,4 +1,4 @@
-import { Container } from "@mui/material";
+import { Box } from "@mui/material";
 import Navbar from "../components/Navbar";
 import { useRef } from "react";
 import ContactForm from "../components/ContactFrom";
@@ -37,7 +37,8 @@ function Home() {
   };
 
   return (
-    <Container maxWidth="lg">
+<Box sx={{ width: "100%", overflow: "hidden" }}>
+
       {/* <div>
         <h1>Welcome to Our App</h1>
         <Link to="/login">
@@ -56,7 +57,7 @@ function Home() {
       <AboutUs ref={aboutRef} />
       <ContactForm ref={contactRef} />
       <Footer />
-    </Container>
+    </Box>
   );
 }
 
