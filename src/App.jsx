@@ -10,6 +10,7 @@ import Signup from "./pages/SignUp";
 import UserFrontPage from "./pages/UserFrontPage.jsx";
 import AdminFrontPage from "./pages/AdminFrontPage.jsx";
 import UserBookings from "./components/UserBookings.jsx";
+import UserLikedProducts from "./components/UserLikedProducts.jsx";
 
 // Create a QueryClient instance
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => {
             <Route path="/AdminViewProducts" element={<AdminViewProducts />} />
             <Route path="/edit-product/:id" element={<AdminEditProduct />} />
             <Route path="/UserBookings" element={<UserBookings />} />
+            <Route path="/UserLikedProducts" element={<UserLikedProducts />} />
           </Route>
         </Routes>
       </Router>

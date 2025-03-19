@@ -4,7 +4,8 @@ import { jwtDecode } from "jwt-decode";
 import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
-import EventNoteIcon from "@mui/icons-material/EventNote"; // New Bookings Icon
+import EventNoteIcon from "@mui/icons-material/EventNote"; // Bookings Icon
+import FavoriteIcon from "@mui/icons-material/Favorite"; // Liked Icon
 
 const UserFrontPageNavbar = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const UserFrontPageNavbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/Login");
   };
 
   return (
@@ -46,7 +47,7 @@ const UserFrontPageNavbar = () => {
           <HomeIcon fontSize="large" />
         </IconButton>
 
-        {/* Middle Section - Username (First Half) */}
+        {/* Middle Section - Username */}
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
           {user && (
             <Typography
@@ -63,15 +64,27 @@ const UserFrontPageNavbar = () => {
           )}
         </Box>
 
-        {/* Right Section - Bookings & Logout (Second Half) */}
+        {/* Right Section - Liked, Cart & Logout */}
         <Box sx={{ display: "flex", gap: 2 }}>
-          {/* Bookings Icon (New Icon: EventNote) */}
-          <IconButton
-            onClick={() => navigate("/UserBookings")}
-            sx={{ color: "#4CAF50", "&:hover": { color: "#66BB6A" } }}
-          >
-            <EventNoteIcon fontSize="large" />
-          </IconButton>
+          {/* ✅ "Liked" button (ALWAYS visible EXCEPT for Admin) */}
+          {user?.email !== "Admin123@gmail.com" && (
+            <IconButton
+              onClick={() => navigate("/UserLikedProducts")}
+              sx={{ color: "#E91E63", "&:hover": { color: "#FF4081" } }}
+            >
+              <FavoriteIcon fontSize="large" />
+            </IconButton>
+          )}
+
+          {/* ✅ "Bookings" button (ONLY visible for non-admin users) */}
+          {user?.email !== "Admin123@gmail.com" && (
+            <IconButton
+              onClick={() => navigate("/UserBookings")}
+              sx={{ color: "#4CAF50", "&:hover": { color: "#66BB6A" } }}
+            >
+              <EventNoteIcon fontSize="large" />
+            </IconButton>
+          )}
 
           {/* Logout Icon */}
           <IconButton

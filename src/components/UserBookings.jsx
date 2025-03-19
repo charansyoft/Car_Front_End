@@ -8,7 +8,11 @@ import {
   CardContent,
   CircularProgress,
   CardMedia,
+  Paper,
+  Button,
+  IconButton,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import UserFrontPageNavbar from "./UserFrontPageNavbar";
 import Footer from "../components/Footer";
 
@@ -25,13 +29,11 @@ const UserBookings = () => {
         const decoded = jwtDecode(token);
         setUser(decoded);
 
-        // Fetch user bookings
         axios
           .get("http://localhost:5000/api/bookings/user", {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((response) => {
-            // ✅ Only display bookings where user & product exist
             const validBookings = response.data.filter(
               (booking) => booking.user && booking.productId
             );
@@ -49,30 +51,39 @@ const UserBookings = () => {
     }
   }, []);
 
+  const handleDelete = (id) => {
+    axios
+      .delete(`http://localhost:5000/api/bookings/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then(() => {
+        setBookings(bookings.filter((booking) => booking._id !== id));
+      })
+      .catch((error) => console.error("Error deleting booking:", error));
+  };
+
+  const totalCars = bookings.length;
+  const totalPrice = bookings.reduce((sum, booking) => sum + booking.price, 0);
+
   return (
     <div>
       <UserFrontPageNavbar />
-      <Box sx={{ padding: 4, minHeight: "70vh", backgroundColor: "#F4F4F4" }}>
-        <Typography
-          variant="h4"
-          sx={{ textAlign: "center", fontWeight: "bold", marginBottom: 3 }}
-        >
+      <Box sx={{ padding: 3, minHeight: "70vh", backgroundColor: "#FAFAFA" }}>
+        <Typography variant="h5" align="center" gutterBottom>
           My Cart
         </Typography>
 
+        <Paper elevation={1} sx={{ p: 2, mb: 3, textAlign: "center", borderRadius: 2 }}>
+          <Typography variant="body1">Total Cars: {totalCars}</Typography>
+          <Typography variant="body1">Total Price: ${totalPrice.toLocaleString()}</Typography>
+        </Paper>
+
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
-            <CircularProgress />
+            <CircularProgress size={40} />
           </Box>
-        ) : bookings.length === 0 ? (
-          <Typography
-            variant="h6"
-            sx={{
-              textAlign: "center",
-              color: "#757575",
-              fontStyle: "italic",
-            }}
-          >
+        ) : totalCars === 0 ? (
+          <Typography align="center" color="textSecondary" fontStyle="italic">
             No bookings found.
           </Typography>
         ) : (
@@ -82,51 +93,52 @@ const UserBookings = () => {
               sx={{
                 maxWidth: "90%",
                 margin: "auto",
-                marginBottom: 3,
+                marginBottom: 2,
                 padding: 2,
-                boxShadow: 3,
-                backgroundColor: "#FFF",
                 display: "flex",
-                flexDirection: "row", // ✅ Image & details side by side
+                flexDirection: "row",
                 alignItems: "center",
-                borderRadius: 3,
+                borderRadius: 2,
+                boxShadow: 1,
+                backgroundColor: "#FFF",
               }}
             >
-              {/* ✅ Product Image on the Left */}
               <CardMedia
                 component="img"
-                image={`http://localhost:5000${booking.productId.image}`} // ✅ Add base URL
+                image={`http://localhost:5000${booking.productId.image}`}
                 alt={booking.productId.title}
-                sx={{
-                  width: 300, // ✅ Increased width
-                  height: 200, // ✅ Increased height
-                  objectFit: "cover",
-                  borderRadius: 2,
-                  boxShadow: "3px 3px 10px rgba(0, 0, 0, 0.2)",
-                  marginRight: 3,
-                }}
+                sx={{ width: 200, height: 150, objectFit: "cover", borderRadius: 1, marginRight: 2 }}
               />
-
               <CardContent sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  {booking.productId.title} {/* ✅ Display Product Name */}
+                <Typography variant="subtitle1" fontWeight={500}>
+                  {booking.productId.title}
                 </Typography>
-                <Typography sx={{ color: "#616161" }}>
-                  Price: ${booking.price}
+                <Typography variant="body2" color="textSecondary">
+                  Price: ${booking.price.toLocaleString()}
                 </Typography>
-                <Typography sx={{ color: "#616161" }}>
+                <Typography variant="body2" color="textSecondary">
                   Fuel Type: {booking.fuelType}
                 </Typography>
-                <Typography sx={{ color: "#616161" }}>
+                <Typography variant="body2" color="textSecondary">
                   Transmission: {booking.transmission}
                 </Typography>
-                <Typography sx={{ color: "#0288D1", fontSize: "14px" }}>
-                  Booked on: {new Date(booking.createdAt).toLocaleString()}
-                </Typography>
-                
               </CardContent>
+              <IconButton onClick={() => handleDelete(booking._id)} color="error">
+                <DeleteIcon />
+              </IconButton>
             </Card>
           ))
+        )}
+
+        {totalCars > 0 && (
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+            <Button variant="outlined" size="medium" sx={{ borderRadius: 2 }}>
+              Cash on Delivery (COD)
+            </Button>
+            <Button variant="contained" size="medium" sx={{ borderRadius: 2 }}>
+              Online Payment
+            </Button>
+          </Box>
         )}
       </Box>
       <Footer />
