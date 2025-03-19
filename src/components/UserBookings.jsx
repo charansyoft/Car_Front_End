@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBookings, deleteBooking } from "../redux/bookingsSlice";
 import {
   Box,
   Typography,
@@ -17,49 +17,17 @@ import UserFrontPageNavbar from "./UserFrontPageNavbar";
 import Footer from "../components/Footer";
 
 const UserBookings = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const { bookings, status, error } = useSelector((state) => state.bookings);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    dispatch(fetchBookings());
+  }, [dispatch]);
 
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser(decoded);
-
-        axios
-          .get("http://localhost:5000/api/bookings/user", {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((response) => {
-            const validBookings = response.data.filter(
-              (booking) => booking.user && booking.productId
-            );
-            setBookings(validBookings);
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.error("Error fetching bookings:", error);
-            setLoading(false);
-          });
-      } catch (error) {
-        console.error("Invalid token", error);
-        setLoading(false);
-      }
+  const handleDelete = (bookingId) => {
+    if (window.confirm("Are you sure you want to cancel this booking?")) {
+      dispatch(deleteBooking(bookingId));
     }
-  }, []);
-
-  const handleDelete = (id) => {
-    axios
-      .delete(`http://localhost:5000/api/bookings/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then(() => {
-        setBookings(bookings.filter((booking) => booking._id !== id));
-      })
-      .catch((error) => console.error("Error deleting booking:", error));
   };
 
   const totalCars = bookings.length;
@@ -78,7 +46,7 @@ const UserBookings = () => {
           <Typography variant="body1">Total Price: ${totalPrice.toLocaleString()}</Typography>
         </Paper>
 
-        {loading ? (
+        {status === "loading" ? (
           <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
             <CircularProgress size={40} />
           </Box>

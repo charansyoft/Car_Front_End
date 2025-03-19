@@ -1,9 +1,10 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Container, Grid, Card, CardContent, CardMedia, Typography, CircularProgress } from "@mui/material";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Container, Grid, Card, CardContent, CardMedia, Typography, CircularProgress, IconButton } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"; // Minimal delete icon
+import axios from "axios";
 import UserFrontPageNavbar from "./UserFrontPageNavbar";
 import Footer from "./Footer";
-import axios from "axios";
 
 // Fetch liked products
 const fetchLikedProducts = async () => {
@@ -17,11 +18,38 @@ const fetchLikedProducts = async () => {
   return data;
 };
 
+// Delete liked product
+const deleteLikedProduct = async (likeId) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Unauthorized: Please log in first.");
+
+  await axios.delete(`http://localhost:5000/api/liked/${likeId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return likeId;
+};
+
 const UserLikedProducts = () => {
+  const queryClient = useQueryClient();
+  
   const { data: likedProducts = [], isLoading, isError } = useQuery({
     queryKey: ["liked"],
     queryFn: fetchLikedProducts,
   });
+
+  const mutation = useMutation({
+    mutationFn: deleteLikedProduct,
+    onSuccess: (likeId) => {
+      queryClient.setQueryData(["liked"], (oldData) => oldData.filter((product) => product._id !== likeId));
+    },
+  });
+
+  const handleUnlike = (likeId) => {
+    if (window.confirm("Are you sure you want to remove this product from liked?")) {
+      mutation.mutate(likeId);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -42,7 +70,7 @@ const UserLikedProducts = () => {
   return (
     <div>
       <UserFrontPageNavbar />
-      <Container sx={{ mt: 5 }}>
+      <Container sx={{ mt: 5, mb:5 }}>
         <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: "bold", fontFamily: "Poppins, sans-serif" }}>
           Your Liked Products ❤️
         </Typography>
@@ -63,13 +91,20 @@ const UserLikedProducts = () => {
                     alt={product.name}
                     sx={{ borderTopLeftRadius: "15px", borderTopRightRadius: "15px" }}
                   />
-                  <CardContent>
+                  <CardContent sx={{ textAlign: "center" }}>
                     <Typography variant="h6" sx={{ fontWeight: "bold", fontFamily: "Poppins, sans-serif" }}>
                       {product.name}
                     </Typography>
                     <Typography variant="body1" sx={{ fontFamily: "Poppins, sans-serif", color: "#555" }}>
                       Price: ${product.price}
                     </Typography>
+                    <IconButton
+                      aria-label="delete"
+                      sx={{ color: "red", mt: 1 }}
+                      onClick={() => handleUnlike(product._id)}
+                    >
+                      <DeleteOutlineIcon fontSize="large" /> {/* Bigger delete icon */}
+                    </IconButton>
                   </CardContent>
                 </Card>
               </Grid>
